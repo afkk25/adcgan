@@ -1099,10 +1099,29 @@ class Distribution(torch.Tensor):
     
   # Silly hack: overwrite the to() method to wrap the new object
   # in a distribution as well
+  # def to(self, *args, **kwargs):
+  #   new_obj = Distribution(self)
+  #   new_obj.init_distribution(self.dist_type, **self.dist_kwargs)
+  #   new_obj.data = super().to(*args, **kwargs)    
+  #   return new_obj
   def to(self, *args, **kwargs):
-    new_obj = Distribution(self)
-    new_obj.init_distribution(self.dist_type, **self.dist_kwargs)
-    new_obj.data = super().to(*args, **kwargs)    
+    # Call the parent .to() which returns a plain Tensor
+    tensor = super().to(*args, **kwargs)
+    
+    # Create a new Distribution object from that tensor
+    new_obj = tensor.as_subclass(Distribution)
+    
+    # Copy over attributes safely if they exist
+    if hasattr(self, 'dist_type'):
+        new_obj.dist_type = self.dist_type
+    if hasattr(self, 'dist_kwargs'):
+        new_obj.dist_kwargs = self.dist_kwargs
+    
+    # Copy any extra attributes if needed
+    for attr in ['mean', 'var', 'num_categories', 'label']:
+        if hasattr(self, attr):
+            setattr(new_obj, attr, getattr(self, attr))
+    
     return new_obj
 
 
