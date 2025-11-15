@@ -755,7 +755,7 @@ def load_weights(G, D, state_dict, weights_root, experiment_name,
     safe_globals = [np._core.multiarray.scalar]
     ckpt_file = '%s/%s.pth' % (root, join_strings('_', ['state_dict', name_suffix]))
     with torch.serialization.safe_globals(safe_globals):
-        state_dict[item] = torch.load(ckpt_file)[item]
+        state_dict[item] = torch.load(ckpt_file, weights_only=False)
   if G_ema is not None:
     G_ema.load_state_dict(
       torch.load('%s/%s.pth' % (root, join_strings('_', ['G_ema', name_suffix]))),
