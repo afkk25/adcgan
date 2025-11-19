@@ -122,6 +122,7 @@ def testD(config):
   LR.fit(train_data, train_label)
   acc = LR.score(test_data, test_label)
   print(acc)
+  return acc
 
 def testG_iFID(config):
   # Prepare state dict, which holds things like epoch # and itr #
@@ -210,6 +211,7 @@ def testG_iFID(config):
     print(FID)
     FIDs.append(FID)
   print(np.mean(FIDs))
+  return np.mean(FIDs)
 
 
 def main():
@@ -218,8 +220,11 @@ def main():
   # parser = utils.add_sample_parser(parser)
   config = vars(parser.parse_args())
   print(config)
-  testD(config)
-  testG_iFID(config)
+  acc = testD(config)
+  mean_FID = testG_iFID(config)
+  print("===========RESULTS===========")
+  print(f"Accuracy: {acc}")
+  print(f"Mean FID: {mean_FID}")
   
 if __name__ == '__main__':    
   main()
