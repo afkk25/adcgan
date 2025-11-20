@@ -197,9 +197,12 @@ def testG_iFID(config):
   
   G_batch_size = max(config['G_batch_size'], config['batch_size'])
   FIDs = []
+  IS_means = []
+  IS_stds = []
+
   for label in range(utils.nclass_dict[config['dataset']]):
     # Prepare inception metrics: FID and IS
-    get_inception_metrics = inception_utils.prepare_inception_metrics(config['dataset'], config['parallel'], config['no_fid'], no_is=True, label=label)
+    get_inception_metrics = inception_utils.prepare_inception_metrics(config['dataset'], config['parallel'], config['no_fid'], no_is=False, label=label)
     z_, y_ = utils.prepare_z_y(G_batch_size, G.dim_z, config['n_classes'],
                                device=device, fp16=config['G_fp16'], label=label)
     sample = functools.partial(utils.sample,
@@ -209,9 +212,14 @@ def testG_iFID(config):
                                                  config['num_inception_images'],
                                                  num_splits=10)
     print(FID)
+    IS_means.append(IS_mean)
+    IS_stds.append(IS_std)
     FIDs.append(FID)
-  print(np.mean(FIDs))
-  return np.mean(FIDs)
+  print("=================================")
+  print(f"Mean IS: {np.mean(IS_means):.4f} ± {np.mean(IS_stds):.4f}")
+  print(f"Mean FID: {np.mean(FIDs):.4f}")
+  return np.mean(IS_means), np.mean(IS_stds), np.mean(FIDs)
+  #return np.mean(FIDs)
 
 
 def main():
@@ -221,10 +229,12 @@ def main():
   config = vars(parser.parse_args())
   print(config)
   acc = testD(config)
-  mean_FID = testG_iFID(config)
+  IS_means, IS_stds, FIDs = testG_iFID(config)
   print("===========RESULTS===========")
   print(f"Accuracy: {acc}")
-  print(f"Mean FID: {mean_FID}")
+  print(f"Mean FID: {FIDs}")
+  print(f"Inception Mean: {IS_means}")
+  print(f"Inception Stds: {IS_stds}")
   
 if __name__ == '__main__':    
   main()
