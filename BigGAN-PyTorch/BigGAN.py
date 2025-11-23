@@ -413,6 +413,15 @@ class Discriminator(nn.Module):
     if self.projection:
       out = out + torch.sum(self.embed(y) * h, 1, keepdim=True)
     return out, adc, ac, mi, am
+    
+  def forward_features(self, x):
+    h = x
+    for blocklist in self.blocks:
+        for block in blocklist:
+            h = block(h)
+    h = torch.sum(self.activation(h), [2, 3])  # global pooling
+    return h
+
 
 # Parallelized G_D to minimize cross-gpu communication
 # Without this, Generator outputs would get all-gathered and then rebroadcast.

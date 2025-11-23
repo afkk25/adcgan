@@ -161,6 +161,16 @@ def prepare_parser():
   parser.add_argument(
     '--D_B2', type=float, default=0.999,
     help='Beta2 to use for Discriminator (default: %(default)s)')
+
+  ### Pretraining Classifier
+  parser.add_argument('--pretrain_classifier', action='store_true', default=False,
+                    help='Run classifier pretraining before GAN training')
+  parser.add_argument('--classifier_path', type=str, default='C_pretrained.pth',
+                      help='Path to save/load pretrained classifier')
+  parser.add_argument('--pretrain_epochs', type=int, default=10,
+                      help='Number of epochs for classifier pretraining')
+  parser.add_argument('--lr_C', type=float, default=2e-4,
+                      help='Classifier learning rate')
     
   ### Batch size, parallel, and precision stuff ###
   parser.add_argument(
