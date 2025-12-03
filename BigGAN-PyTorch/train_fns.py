@@ -2,10 +2,11 @@
 Functions for the main loop of training different conditional image models
 '''
 import torch
+from tqdm import tqdm
 import torch.nn as nn
 import torchvision
 import os
-
+import torch.nn.functional as F
 import utils
 import losses
 
@@ -229,3 +230,41 @@ def test(G, D, G_ema, z_, y_, state_dict, config, sample, get_inception_metrics,
   # Log results to file
   test_log.log(itr=int(state_dict['itr']), IS_mean=float(IS_mean),
                IS_std=float(IS_std), FID=float(FID))
+
+
+    
+def pretrain_classifier(device, config, D, loaders):
+      print("Starting classifier pretraining phase...")
+      C = nn.Linear(D.arch['out_channels'][-1], config['n_classes']).to(device)
+
+      # Optimizer
+      optimizer_C = torch.optim.Adam(C.parameters(), lr=config['lr_C'], betas=(0.5, 0.999))
+
+      for epoch in range(config['pretrain_epochs']):
+          C.train()
+          total, correct = 0, 0
+          pbar = tqdm(loaders[0])
+          for i, (x, y) in enumerate(pbar):
+              x_real, y_real = x.to(device), y.to(device)
+
+              # Extract features from D (forward until global pooled "h")
+              with torch.no_grad():
+                  h = D.forward_features(x_real)   # implement once (see below)
+
+              optimizer_C.zero_grad()
+              logits = C(h)
+              loss = F.cross_entropy(logits, y_real)
+              loss.backward()
+              optimizer_C.step()
+
+              pred = logits.argmax(1)
+              correct += (pred == y_real).sum().item()
+              total += y_real.size(0)
+
+          print(f"[Pretrain] Epoch {epoch+1}/{config['pretrain_epochs']} | Acc = {correct/total:.4f}")
+
+      # Save and load into D.ac
+      torch.save(C.state_dict(), config['classifier_path'])
+      D.ac.load_state_dict(C.state_dict(), strict=False)
+      print("Classifier pretraining done — loaded into D.ac.")
+    
