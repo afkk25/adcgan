@@ -37,3 +37,24 @@ If you find our work useful, please consider citing our paper:
   abstract = 	 {Conditional generative models aim to learn the underlying joint distribution of data and labels to achieve conditional data generation. Among them, the auxiliary classifier generative adversarial network (AC-GAN) has been widely used, but suffers from the problem of low intra-class diversity of the generated samples. The fundamental reason pointed out in this paper is that the classifier of AC-GAN is generator-agnostic, which therefore cannot provide informative guidance for the generator to approach the joint distribution, resulting in a minimization of the conditional entropy that decreases the intra-class diversity. Motivated by this understanding, we propose a novel conditional GAN with an auxiliary discriminative classifier (ADC-GAN) to resolve the above problem. Specifically, the proposed auxiliary discriminative classifier becomes generator-aware by recognizing the class-labels of the real data and the generated data discriminatively. Our theoretical analysis reveals that the generator can faithfully learn the joint distribution even without the original discriminator, making the proposed ADC-GAN robust to the value of the coefficient hyperparameter and the selection of the GAN loss, and stable during training. Extensive experimental results on synthetic and real-world datasets demonstrate the superiority of ADC-GAN in conditional generative modeling compared to state-of-the-art classifier-based and projection-based conditional GANs.}
 }
 ```
+
+# CS 436:
+## Team Members & Contributions
+This project was completed by the following team members:
+
+### 2) Contributions: Classifier Pretraining Implementation (Main Change)
+   We added pretrain_classifier() in train_fns.py:
+    - Implements supervised pretraining of the auxiliary classifier using real labeled data
+    - Uses discriminator feature representations (D.forward_features)
+    - Trains classifier for a configurable number of epochs before GAN training
+    - Saves pretrained model and loads it into D.ac
+  => This function helps stabilize early GAN training by ensuring the classifier does not start from random weights.
+   We updated train.py to support classifier pretraining: Calls train_fns.pretrain_classifier() before starting the standard GAN training
+
+3) How to Run:
+   Include in the command:
+    ```
+      --pretrain_classifier
+      --pretrain_epochs <num_epochs>
+      --lr_C <learning_rate>
+    ```
