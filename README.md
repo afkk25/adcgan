@@ -43,8 +43,8 @@ If you find our work useful, please consider citing our paper:
 
 This project was completed by the following team members:
 
-- Afaf Bentakhou (afkk25) : Resolved several runtime errors and outdated components in the original BigGAN codebase, Implemented the classifier pretraining method  (pretrain_classifier()), Hypothesis testing
-- Shiva Prasad Ramaiah (srmaiah17) : Ran the experiments on Colab, Implemented the classifier pretraining method (pretrain_classifier()), Results Visualization
+- Afaf Bentakhou (afkk25) : Resolved several runtime errors and outdated components in the original BigGAN codebase, Implemented the classifier pretraining method  (pretrain_classifier()), Ran experiments on Colab
+- Shiva Prasad Ramaiah (srmaiah17) : Ran the experiments on Colab, Design Hypothesis, Implemented the classifier pretraining method (pretrain_classifier()), Results Visualization
 
 ### 2) Contributions: Classifier Pretraining Implementation (Main Change)
 
