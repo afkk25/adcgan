@@ -40,19 +40,32 @@ If you find our work useful, please consider citing our paper:
 
 # CS 436:
 ## Team Members & Contributions
+
 This project was completed by the following team members:
 
+- Afaf Bentakhou (afkk25) : Resolved several runtime errors and outdated components in the original BigGAN codebase, Implemented the classifier pretraining method  (pretrain_classifier()), Hypothesis testing
+- Shiva Prasad Ramaiah (srmaiah17) : Ran the experiments on Colab, Implemented the classifier pretraining method (pretrain_classifier()), Results Visualization
+
 ### 2) Contributions: Classifier Pretraining Implementation (Main Change)
-   We added pretrain_classifier() in train_fns.py:
+
+   We added pretrain_classifier() in BigGAN-PyTorch/train_fns.py:
+   
     - Implements supervised pretraining of the auxiliary classifier using real labeled data
+    
     - Uses discriminator feature representations (D.forward_features)
+    
     - Trains classifier for a configurable number of epochs before GAN training
+    
     - Saves pretrained model and loads it into D.ac
+    
   => This function helps stabilize early GAN training by ensuring the classifier does not start from random weights.
+  
    We updated train.py to support classifier pretraining: Calls train_fns.pretrain_classifier() before starting the standard GAN training
 
-3) How to Run:
+### 3) How to Run:
+
    Include in the command:
+   
     ```
       --pretrain_classifier
       --pretrain_epochs <num_epochs>
